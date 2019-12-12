@@ -14,8 +14,6 @@ class OrderItemSchema extends Schema {
 
       table.foreign('product_id').references('id').inTable('products').onDelete('cascade')
       table.foreign('order_id').references('id').inTable('orders').onDelete('cascade')
-
-      table.timestamps()
     })
   }
 
