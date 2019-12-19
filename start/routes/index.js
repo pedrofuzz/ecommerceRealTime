@@ -21,6 +21,7 @@ Route.get('/', () => {
 }).as('home')
 
 /**
- * importa rotas de autenticação
+ * importar arquivos de rotas
  */
 require('./auth')
+require('./admin')
