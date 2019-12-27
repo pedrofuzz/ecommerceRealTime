@@ -21,7 +21,7 @@ class UserController {
    * @param { object } ctx.pagination
    */
   async index ({ request, response, pagination }) {
-    const { name } = request.input('name')
+    const name = request.input('name')
     const query = User.query()
 
     if(name){
@@ -105,9 +105,9 @@ class UserController {
    * @param {Response} ctx.response
    */
   async destroy ({ params: { id }, response }) {
-    const user = await User.findOrFail(id)
     try {
-      await user.delete
+      const user = await User.findOrFail(id)
+      await user.delete()
       return response.status(204).send()
     } catch (error) {
       return response.status(500).send({ 
