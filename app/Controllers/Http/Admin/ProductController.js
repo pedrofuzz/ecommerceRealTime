@@ -99,7 +99,7 @@ class ProductController {
    * @param {Response} ctx.response
    */
   async destroy ({ params: { id }, request, response }) {
-    const product = await Product.findOrFail()
+    const product = await Product.findOrFail(id)
     try {
       await product.delete()
       return response.status(204).send()
