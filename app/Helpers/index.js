@@ -24,6 +24,59 @@ const Helpers = use('Helpers')
      return string
  }
 
+ /**
+  * Move um único arquivo para o caminho especificado
+  * se nenhum caminho especificado, move para 'public/uploads'
+  * @param { FileJar } file o arquivo a ser gereniado
+  * @param { string } path caminho para o arquivo
+  * @param { object<FileJar> }
+  */
+const image_single_upload = async (file, path = null) => {
+    path = path ? path : Helpers.publicPath('uploads')
+    // gera nome aleatório
+    const random_name = str_random(30)
+    let filename = `${new Date().getTime()}-${random_name}.${file.subtype}`
+
+    //renomeia o arquivo e move para path
+    await file.move(path, {
+        name: filename
+    })
+
+    return file
+}
+
+/**
+ * Move um múltiplos arquivos para o caminho especificado
+ * se nenhum caminho especificado, move para 'public/uploads'
+ * @param { FileJar } fileJar
+ * @param { string } path
+ * @return { object }
+ */
+ const image_multiple_uploads = async (fileJar, path = null) => {
+    path = path ? path : Helpers.publicPath('uploads')
+    let successes = [], errors = []
+
+    await Promise.all(fileJar.files.map(async file => {
+        let random_name = await str_random(30)
+        let filename = `${new Date().getTime()}-${random_name}.${file.subtype}`
+
+        await file.move(path, {
+            name: filename
+        })
+
+        //verifica se foi movido com sucesso
+        if(file.moved()){
+            successes.push(file)
+        }else {
+            errors.push(file.error())
+        }
+    }))
+
+    return { successes, errors }
+ }
+
  module.exports = {
-     str_random
+     str_random,
+     image_single_upload,
+     image_multiple_uploads
  }
