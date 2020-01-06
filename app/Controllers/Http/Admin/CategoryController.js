@@ -5,6 +5,7 @@
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
 const Category = use('App/Models/Category')
+const Transformer = use('App/Transformers/Admin/CategoryTransformer')
 
 /**
  * Resourceful controller for interacting with categories
@@ -20,16 +21,16 @@ class CategoryController {
    * @param {View} ctx.view
    * @param {object} ctx.pagination
    */
-  async index ({ request, response, view, pagination }) {
+  async index({ request, response, transform, pagination }) {
     const title = request.input('title')
-
     const query = Category.query()
 
-    if(title) {
+    if (title) {
       query.where('title', 'LIKE', `%${title}%`)
     }
 
-    const categories = await query.paginate(pagination.page, pagination.limit)
+    var categories = await query.paginate(pagination.page, pagination.limit)
+    categories = await transform.paginate(categories, Transformer)
     return response.send(categories)
   }
 
@@ -41,7 +42,7 @@ class CategoryController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store({ request, response }) {
     try {
       const { title, description, image_id } = request.all()
       const category = await Category.create({ title, description, image_id })
@@ -50,7 +51,7 @@ class CategoryController {
     } catch (error) {
       return response.status(400).send({
         message: "Erro ao processar sua solicitação, verifique todos os campos e tente novamente"
-    })
+      })
     }
   }
 
@@ -63,7 +64,7 @@ class CategoryController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params: { id }, request, response, view }) {
+  async show({ params: { id }, request, response, view }) {
     try {
       const category = await Category.findOrFail(id)
       return response.send(category)
@@ -80,7 +81,7 @@ class CategoryController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params: { id }, request, response }) {
+  async update({ params: { id }, request, response }) {
     const category = await Category.findOrFail(id)
     const { title, description, image_id } = request.all()
     category.merge({ title, description, image_id })
@@ -96,7 +97,7 @@ class CategoryController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params: { id }, request, response }) {
+  async destroy({ params: { id }, request, response }) {
     try {
       const category = await Category.findOrFail(id)
       await category.delete()

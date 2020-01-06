@@ -23,20 +23,19 @@ class OrderController {
    * @param {Response} ctx.response
    * @param {object} ctx.pagination
    */
-  async index ({ request, response, pagination }) {
+  async index({ request, response, pagination }) {
     const { status, id } = request.only(['status', 'id'])
     const query = Order.query()
 
-    if(status && id) {
+    if (status && id) {
+      query.where('status', status).orWhere('id', 'LIKE', `%${id}%`)
+    } else if (status) {
       query.where('status', status)
-      query.orWhere('id', 'LIKE', `%${id}%`)
-    }else if(status){
-      query.where('status', status)
-    }else if(id){
+    } else if (id) {
       query.where('id', 'LIKE', `%${id}%`)
     }
 
-    const orders = query.paginate(pagination.page, pagination.limit)
+    const orders = await query.paginate(pagination.page, pagination.limit)
     return response.send(orders)
   }
 
@@ -48,14 +47,14 @@ class OrderController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store({ request, response }) {
     const trx = await Database.beginTransaction()
     try {
       const { user_id, items, status } = request.all()
       let order = await Order.create({ user_id, status }, trx)
       const service = new Service(order, trx)
 
-      if(items && items.length > 0){
+      if (items && items.length > 0) {
         await service.syncItems(items)
       }
 
@@ -78,7 +77,7 @@ class OrderController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params: { id }, request, response, view }) {
+  async show({ params: { id }, request, response, view }) {
     const order = await Order.findOrFail(id)
     return response.send(order)
   }
@@ -91,7 +90,7 @@ class OrderController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params: { id }, request, response }) {
+  async update({ params: { id }, request, response }) {
     const order = await Order.findOrFail(id)
     const trx = await Database.beginTransaction()
     try {
@@ -118,7 +117,7 @@ class OrderController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params: { id }, request, response }) {
+  async destroy({ params: { id }, request, response }) {
     const order = await Order.findOrFail(id)
     const trx = await Database.beginTransaction()
     try {
@@ -136,7 +135,7 @@ class OrderController {
     }
   }
 
-  async applyDiscount ({ params: { id }, request, response }) {
+  async applyDiscount({ params: { id }, request, response }) {
     const { code } = request.all()
     const coupon = await Coupon.findByOrFail('code', code.toUpperCase())
     const order = await Order.findOrFail(id)
@@ -147,14 +146,14 @@ class OrderController {
       const orderDiscounts = await order.coupons().getCount()
 
       const canApplyToOrder = orderDiscounts < 1 || (orderDiscounts >= 1 && coupon.recursive)
-      if(canAddDiscount && canApplyToOrder){
+      if (canAddDiscount && canApplyToOrder) {
         discount = await Discount.findOrCreate({
           order_id: order.id,
           coupon_id: coupon.id
         })
         info.message = 'Cupom aplicado com sucesso'
         info.success = true
-      }else {
+      } else {
         info.message = 'Não foi possível aplicar o cupom'
         info.success = false
       }
@@ -165,7 +164,7 @@ class OrderController {
     }
   }
 
-  async removeDiscount ({ request, response }){
+  async removeDiscount({ request, response }) {
     const { discount_id } = request.all()
     const discount = await Discount.findOrFail(discount_id)
     await discount.delete()

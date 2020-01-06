@@ -21,11 +21,11 @@ class CouponController {
    * @param {Response} ctx.response
    * @param {object} ctx.pagination
    */
-  async index ({ request, response, pagination }) {
+  async index({ request, response, pagination }) {
     const code = request.input('code')
-    const query = await Coupon.query()
+    const query = Coupon.query()
 
-    if(code){
+    if (code) {
       query.where('code', 'LIKE', `%${code}%`)
     }
 
@@ -41,7 +41,7 @@ class CouponController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store({ request, response }) {
     const trx = await Database.beginTransaction()
     /**
      * 1 - produto - pode ser utilizado apenas em produtos específicos
@@ -72,23 +72,23 @@ class CouponController {
       const service = new Service(coupon, trx)
 
       // insere os relacionamentos no DB
-      if(users && users.length > 0){
+      if (users && users.length > 0) {
         await service.syncUsers(users)
         can_use_for.client = true
       }
 
-      if(products && products.length > 0){
+      if (products && products.length > 0) {
         await service.syncProducts(products)
         can_use_for.product = true
       }
 
-      if(can_use_for.product && can_use_for.client){
+      if (can_use_for.product && can_use_for.client) {
         coupon.can_use_for = 'product_client'
-      }else if(can_use_for.product && !can_use_for.client){
+      } else if (can_use_for.product && !can_use_for.client) {
         coupon.can_use_for = 'product'
-      }else if(!can_use_for.product && can_use_for.client){
+      } else if (!can_use_for.product && can_use_for.client) {
         coupon.can_use_for = 'client'
-      }else {
+      } else {
         coupon.can_use_for = 'all'
       }
 
@@ -112,7 +112,7 @@ class CouponController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params: { id }, request, response, view }) {
+  async show({ params: { id }, request, response, view }) {
     const coupon = await Coupon.findOrFail(id)
     return response.send(coupon)
   }
@@ -125,7 +125,7 @@ class CouponController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params: { id }, request, response }) {
+  async update({ params: { id }, request, response }) {
     const trx = await Database.beginTransaction()
     var coupon = await Coupon.findOrFail(id)
     var can_use_for = {
@@ -148,30 +148,30 @@ class CouponController {
 
       const { users, products } = request.only(['users, products'])
       const service = new Service(coupon, trx)
-      
-      if(users && users.length > 0){
+
+      if (users && users.length > 0) {
         await service.syncUsers(users)
         can_use_for.client = true
       }
 
-      if(products && products.length > 0){
+      if (products && products.length > 0) {
         await service.syncProducts(products)
         can_use_for.product = true
       }
 
-      if(can_use_for.product && can_use_for.client){
+      if (can_use_for.product && can_use_for.client) {
         coupon.can_use_for = 'product_client'
-      }else if(can_use_for.product && !can_use_for.client){
+      } else if (can_use_for.product && !can_use_for.client) {
         coupon.can_use_for = 'product'
-      }else if(!can_use_for.product && can_use_for.client){
+      } else if (!can_use_for.product && can_use_for.client) {
         coupon.can_use_for = 'client'
-      }else {
+      } else {
         coupon.can_use_for = 'all'
       }
 
       await coupon.save(trx)
       await trx.commit()
-      
+
       return response.status(200).send(coupon)
     } catch (error) {
       await trx.rollback()
@@ -189,7 +189,7 @@ class CouponController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params: { id }, request, response }) {
+  async destroy({ params: { id }, request, response }) {
     const trx = await Database.beginTransaction()
     const coupon = await Coupon.findOrFail(id)
     try {
