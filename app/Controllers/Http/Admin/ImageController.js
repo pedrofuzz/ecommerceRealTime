@@ -21,7 +21,7 @@ class ImageController {
    * @param {Response} ctx.response
    * @param {object} ctx.pagination
    */
-  async index ({ request, response, pagination }) {
+  async index({ request, response, pagination }) {
     const images = await Image.query().orderBy('id', 'DESC').paginate(pagination.page, pagination.limit)
     return response.send(images)
   }
@@ -34,7 +34,7 @@ class ImageController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store({ request, response }) {
     try {
       // captura uma imagem ou mais do request
       const fileJar = request.file('images', {
@@ -45,9 +45,9 @@ class ImageController {
       //retorno pro usuário
       let images = []
       // se um arquivo, usa image_single_upload
-      if(!fileJar.files) {
+      if (!fileJar.files) {
         const file = await image_single_upload(fileJar)
-        if(file.moved()){
+        if (file.moved()) {
           const image = await Image.create({
             path: file.fileName,
             size: file.size,
@@ -94,7 +94,7 @@ class ImageController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params: { id }, request, response }) {
+  async show({ params: { id }, request, response }) {
     const image = await Image.findOrFail(id)
     return response.send(image)
   }
@@ -107,7 +107,7 @@ class ImageController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params: { id }, request, response }) {
+  async update({ params: { id }, request, response }) {
     const image = await Image.findOrFail(id)
     try {
       image.merge(request.only(['original_name']))
@@ -128,16 +128,13 @@ class ImageController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params: { id }, request, response }) {
+  async destroy({ params: { id }, request, response }) {
     const image = await Image.findOrFail(id)
     try {
       let filepath = Helpers.publicPath(`uploads/${image.path}`)
 
-      await fs.unlink(filepath, err => {
-        if(!err){
-          await image.delete()
-        }
-      })
+      fs.unlinkSync(filepath)
+      await image.delete()
 
       return response.status(204).send()
     } catch (error) {

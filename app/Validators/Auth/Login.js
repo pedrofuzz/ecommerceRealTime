@@ -4,7 +4,7 @@ class AuthLogin {
   get rules() {
     return {
       email: 'required|email|exists:users,email',
-      password: 'required|'
+      password: 'required'
     }
   }
 
