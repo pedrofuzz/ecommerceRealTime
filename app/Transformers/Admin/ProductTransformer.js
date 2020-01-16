@@ -4,31 +4,24 @@ const BumblebeeTransformer = use('Bumblebee/Transformer')
 const ImageTransformer = use('App/Transformers/Admin/ImageTransformer')
 
 /**
- * CategoryTransformer class
+ * ProductTransformer class
  *
- * @class CategoryTransformer
+ * @class ProductTransformer
  * @constructor
  */
-class CategoryTransformer extends BumblebeeTransformer {
-
-  //inclui o objeto por padrão
+class ProductTransformer extends BumblebeeTransformer {
   static get defaultInclude() {
     return ['image']
   }
-
-  // inclui o objeto em casos específicos
-  // static get availableInclude() {
-  //   return ['']
-  // }
-
   /**
    * This method is used to transform the data.
    */
   transform(model) {
     return {
       id: model.id,
-      title: model.title,
-      description: model.description
+      name: model.name,
+      description: model.description,
+      price: model.price
     }
   }
 
@@ -37,4 +30,4 @@ class CategoryTransformer extends BumblebeeTransformer {
   }
 }
 
-module.exports = CategoryTransformer
+module.exports = ProductTransformer

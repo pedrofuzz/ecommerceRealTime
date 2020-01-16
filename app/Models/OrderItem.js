@@ -5,7 +5,7 @@ const Model = use('Model')
 
 class OrderItem extends Model {
 
-    static boot(){
+    static boot() {
         super.boot()
 
         this.addHook('beforeSave', 'OrderItemHook.updateSubtotal')
@@ -15,11 +15,11 @@ class OrderItem extends Model {
         return ['App/Models/Traits/NoTimestamp']
     }
 
-    product(){
+    product() {
         return this.belongsTo('App/Models/Product')
     }
 
-    order(){
+    order() {
         return this.belongsTo('App/Models/Order')
     }
 }
