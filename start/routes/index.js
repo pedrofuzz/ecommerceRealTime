@@ -17,6 +17,11 @@
 const Route = use('Route')
 
 /**
+ * retorna o usuário logado atualmente
+ */
+Route.get('v1/me', 'UserController.me').as('me').middleware('auth')
+
+/**
  * importar arquivos de rotas
  */
 require('./auth')

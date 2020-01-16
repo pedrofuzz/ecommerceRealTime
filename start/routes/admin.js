@@ -31,4 +31,9 @@ Route.group(() => {
         [['users.update'], ['Admin/StoreUser']]
     ]))
 
+    /**
+     * Dashboard Route
+     */
+    Route.get('dashboard', 'DashboardController.index').as('dashboard')
+
 }).prefix('v1/admin').namespace('Admin').middleware(['auth', 'is:( admin || manager )'])
