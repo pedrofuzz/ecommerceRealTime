@@ -27,7 +27,6 @@ class OrderController {
   async index({ request, response, pagination, transform }) {
     const { status, id } = request.only(['status', 'id'])
     const query = Order.query()
-
     if (status && id) {
       query.where('status', status).orWhere('id', 'LIKE', `%${id}%`)
     } else if (status) {
@@ -39,6 +38,7 @@ class OrderController {
     var orders = await query.paginate(pagination.page, pagination.limit)
     orders = await transform.paginate(orders, Transformer)
     return response.send(orders)
+
   }
 
   /**

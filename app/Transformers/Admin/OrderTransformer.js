@@ -36,7 +36,7 @@ class OrderTransformer extends BumblebeeTransformer {
     return this.item(order.getRelated('user'), UserTransformer)
   }
 
-  includeitems(order) {
+  includeItems(order) {
     return this.collection(order.getRelated('items'), OrderItemTransformer)
   }
 

@@ -25,7 +25,7 @@ class UserTransformer extends BumblebeeTransformer {
     }
   }
 
-  includeImage() {
+  includeImage(model) {
     return this.item(model.getRelated('image'), ImageTransformer)
   }
 }
