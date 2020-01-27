@@ -131,7 +131,6 @@ class OrderController {
       await order.coupons().delete(trx)
       await order.delete(trx)
       await trx.commit()
-
       return response.status(204).send()
     } catch (error) {
       await trx.rollback()
